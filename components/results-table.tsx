@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Download, Mail, Phone, Eye, Filter } from "lucide-react"
+import { Download, Mail, Phone, Eye, Filter, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -26,9 +26,14 @@ export default function ResultsTable() {
   const candidateResults = state.matchResults
     .map((match) => {
       const resume = state.parsedResumes.find((r) => r.id === match.resumeId)
+      if (!resume) return null
+
+      const originalFile = state.uploadedFiles.find((f) => f.id === resume.fileId)
+
       return {
         ...match,
-        resume: resume!,
+        resume,
+        originalFile,
       }
     })
     .filter(Boolean)
@@ -82,6 +87,7 @@ export default function ResultsTable() {
       "Education Match",
       "Match Status",
       "Feedback",
+      "Original Filename",
     ]
     const csvData = sortedResults.map((result) => [
       result.resume.candidateName,
@@ -93,6 +99,7 @@ export default function ResultsTable() {
       result.educationMatch,
       result.isMatch ? "Strong Match" : result.overallScore >= 60 ? "Potential" : "Poor Match",
       `"${result.feedback}"`,
+      result.originalFile?.name || "",
     ])
 
     const csvContent = [headers, ...csvData].map((row) => row.join(",")).join("\n")
@@ -178,6 +185,12 @@ export default function ResultsTable() {
                     {result.resume.location && (
                       <div className="text-xs text-muted-foreground">{result.resume.location}</div>
                     )}
+                    {result.originalFile && (
+                      <div className="text-xs flex items-center mt-1 text-blue-600">
+                        <FileText className="h-3 w-3 mr-1" />
+                        {result.originalFile.name}
+                      </div>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell>
@@ -262,7 +275,9 @@ export default function ResultsTable() {
                       <DialogContent className="max-w-2xl">
                         <DialogHeader>
                           <DialogTitle>{result.resume.candidateName}</DialogTitle>
-                          <DialogDescription>Detailed candidate profile and analysis</DialogDescription>
+                          <DialogDescription>
+                            {result.originalFile ? `File: ${result.originalFile.name}` : "Detailed candidate profile"}
+                          </DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4">
                           <div>

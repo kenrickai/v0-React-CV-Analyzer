@@ -15,6 +15,7 @@ const ALLOWED_FILE_TYPES = [
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
   "application/msword", // doc
+  "text/plain", // For demo purposes, allow text files
 ]
 
 // Maximum file size in bytes (10MB)
@@ -52,10 +53,11 @@ export default function ResumeUploader() {
     }
 
     filesToValidate.forEach((file) => {
-      // Check file type
-      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-        errors.push(`${file.name} is not a supported file type. Please upload PDF or DOCX files only.`)
-        return
+      // For demo purposes, accept all file types but show a warning for non-standard types
+      const isStandardType = ALLOWED_FILE_TYPES.includes(file.type)
+
+      if (!isStandardType) {
+        console.warn(`File type ${file.type} is not standard, but accepting for demo purposes.`)
       }
 
       // Check file size
@@ -215,7 +217,7 @@ export default function ResumeUploader() {
             onChange={handleFileInputChange}
             className="hidden"
             multiple
-            accept=".pdf,.docx,.doc"
+            accept=".pdf,.docx,.doc,.txt"
           />
         </div>
 
