@@ -1,41 +1,33 @@
 "use client"
 
-import { useState } from "react"
-import { Upload } from "lucide-react"
 import Link from "next/link"
 import ResumeUploader from "@/components/resume-uploader"
 import CriteriaUploader from "@/components/criteria-uploader"
+import AnalysisProcessor from "@/components/analysis-processor"
 import ResultsTable from "@/components/results-table"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import MobileNav from "@/components/mobile-nav"
+import { ResumeAnalysisProvider, useResumeAnalysis } from "@/contexts/resume-analysis-context"
 
-export default function HomePage() {
-  const [activeTab, setActiveTab] = useState("upload")
-  const [analysisProgress, setAnalysisProgress] = useState(0)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
+function MainContent() {
+  const { state, dispatch } = useResumeAnalysis()
 
   const handleContinueToAnalysis = () => {
-    setActiveTab("analyze")
-    setIsAnalyzing(true)
+    if (state.uploadedFiles.length === 0) {
+      dispatch({ type: "SET_ERROR", payload: "Please upload at least one resume before continuing." })
+      return
+    }
 
-    // Simulate analysis progress
-    setAnalysisProgress(0)
-    const interval = setInterval(() => {
-      setAnalysisProgress((prev) => {
-        const newProgress = prev + Math.random() * 10
-        if (newProgress >= 100) {
-          clearInterval(interval)
-          setTimeout(() => {
-            setIsAnalyzing(false)
-            setActiveTab("results")
-          }, 500)
-          return 100
-        }
-        return newProgress
-      })
-    }, 500)
+    if (!state.jobCriteria) {
+      dispatch({ type: "SET_ERROR", payload: "Please define job criteria before continuing." })
+      return
+    }
+
+    dispatch({ type: "SET_CURRENT_STEP", payload: "analyze" })
   }
+
+  const canContinueToAnalysis = state.uploadedFiles.length > 0 && state.jobCriteria !== null
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -253,11 +245,19 @@ export default function HomePage() {
           </p>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs
+          value={state.currentStep}
+          onValueChange={(value) => dispatch({ type: "SET_CURRENT_STEP", payload: value as any })}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="upload">Upload</TabsTrigger>
-            <TabsTrigger value="analyze">Analyze</TabsTrigger>
-            <TabsTrigger value="results">Results</TabsTrigger>
+            <TabsTrigger value="analyze" disabled={!canContinueToAnalysis}>
+              Analyze
+            </TabsTrigger>
+            <TabsTrigger value="results" disabled={state.matchResults.length === 0}>
+              Results
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="upload" className="space-y-8">
@@ -265,44 +265,37 @@ export default function HomePage() {
               <ResumeUploader />
               <CriteriaUploader />
             </div>
-            <div className="flex justify-end">
-              <Button size="lg" onClick={handleContinueToAnalysis}>
+            <div className="flex justify-between items-center">
+              <div className="text-sm text-muted-foreground">
+                {state.uploadedFiles.length > 0 && state.jobCriteria ? (
+                  <span className="text-green-600">✓ Ready to analyze {state.uploadedFiles.length} resumes</span>
+                ) : (
+                  <span>Upload resumes and define job criteria to continue</span>
+                )}
+              </div>
+              <Button size="lg" onClick={handleContinueToAnalysis} disabled={!canContinueToAnalysis}>
                 Continue to Analysis
               </Button>
             </div>
           </TabsContent>
 
           <TabsContent value="analyze">
-            <div className="bg-muted rounded-lg p-8 text-center">
-              <div className="mx-auto w-16 h-16 mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <Upload className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Analyzing Resumes</h3>
-              <p className="text-muted-foreground mb-4">
-                Our system is analyzing your resumes against your job criteria. This may take a few minutes.
-              </p>
-              <div className="w-full max-w-md mx-auto h-2 bg-secondary rounded-full overflow-hidden">
-                <div
-                  className="bg-primary h-full rounded-full transition-all duration-300 ease-in-out"
-                  style={{ width: `${Math.round(analysisProgress)}%` }}
-                ></div>
-              </div>
-              <p className="text-sm text-muted-foreground mt-2">{Math.round(analysisProgress)}% complete</p>
-            </div>
+            <AnalysisProcessor />
           </TabsContent>
 
           <TabsContent value="results">
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="text-xl font-semibold">Match Results</h3>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm">
-                    Export CSV
-                  </Button>
-                  <Button variant="outline" size="sm">
-                    Export PDF
-                  </Button>
-                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    dispatch({ type: "RESET_ANALYSIS" })
+                    dispatch({ type: "SET_CURRENT_STEP", payload: "upload" })
+                  }}
+                >
+                  Start New Analysis
+                </Button>
               </div>
               <ResultsTable />
             </div>
@@ -331,5 +324,13 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <ResumeAnalysisProvider>
+      <MainContent />
+    </ResumeAnalysisProvider>
   )
 }

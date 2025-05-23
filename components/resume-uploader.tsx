@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { processResumes } from "@/app/actions/upload-actions"
+import { useResumeAnalysis, type UploadedFile } from "@/contexts/resume-analysis-context"
 
 // Define allowed file types
 const ALLOWED_FILE_TYPES = [
@@ -24,7 +24,7 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024
 const MAX_FILES = 100
 
 export default function ResumeUploader() {
-  const [files, setFiles] = useState<File[]>([])
+  const { state, dispatch } = useResumeAnalysis()
   const [isDragging, setIsDragging] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -46,7 +46,7 @@ export default function ResumeUploader() {
     const errors: string[] = []
 
     // Check if adding these files would exceed the maximum
-    if (files.length + filesToValidate.length > MAX_FILES) {
+    if (state.uploadedFiles.length + filesToValidate.length > MAX_FILES) {
       errors.push(`You can upload a maximum of ${MAX_FILES} files.`)
       return { valid: validFiles, errors }
     }
@@ -65,7 +65,7 @@ export default function ResumeUploader() {
       }
 
       // Check for duplicate files
-      if (files.some((existingFile) => existingFile.name === file.name)) {
+      if (state.uploadedFiles.some((existingFile) => existingFile.name === file.name)) {
         errors.push(`${file.name} has already been added.`)
         return
       }
@@ -88,7 +88,16 @@ export default function ResumeUploader() {
     }
 
     if (valid.length > 0) {
-      setFiles((prevFiles) => [...prevFiles, ...valid])
+      const uploadedFiles: UploadedFile[] = valid.map((file) => ({
+        id: `file-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        file,
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        uploadedAt: new Date(),
+      }))
+
+      dispatch({ type: "ADD_FILES", payload: uploadedFiles })
       setSuccess(`Added ${valid.length} file${valid.length > 1 ? "s" : ""} successfully.`)
       setTimeout(() => setSuccess(null), 3000)
     }
@@ -110,14 +119,12 @@ export default function ResumeUploader() {
     e.target.value = ""
   }
 
-  const removeFile = (index: number) => {
-    const newFiles = [...files]
-    newFiles.splice(index, 1)
-    setFiles(newFiles)
+  const removeFile = (fileId: string) => {
+    dispatch({ type: "REMOVE_FILE", payload: fileId })
   }
 
   const handleUpload = async () => {
-    if (files.length === 0) {
+    if (state.uploadedFiles.length === 0) {
       setError("Please select at least one file to upload.")
       setTimeout(() => setError(null), 5000)
       return
@@ -125,12 +132,6 @@ export default function ResumeUploader() {
 
     setIsUploading(true)
     setUploadProgress(0)
-
-    // Create a FormData object to send files
-    const formData = new FormData()
-    files.forEach((file) => {
-      formData.append("files", file)
-    })
 
     try {
       // Simulate upload progress
@@ -141,22 +142,20 @@ export default function ResumeUploader() {
         })
       }, 500)
 
-      // Process the files using the server action
-      const result = await processResumes(formData)
+      // Simulate upload processing
+      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       clearInterval(progressInterval)
       setUploadProgress(100)
 
       // Show success message
-      setSuccess(result.message)
+      setSuccess(`Successfully uploaded ${state.uploadedFiles.length} files.`)
 
       // Reset after successful upload
       setTimeout(() => {
         setIsUploading(false)
         setUploadProgress(0)
-        // Uncomment the following line to clear files after successful upload
-        // setFiles([])
-      }, 2000)
+      }, 1000)
     } catch (err) {
       setError("An error occurred while uploading files. Please try again.")
       setIsUploading(false)
@@ -220,29 +219,29 @@ export default function ResumeUploader() {
           />
         </div>
 
-        {files.length > 0 && (
+        {state.uploadedFiles.length > 0 && (
           <div className="space-y-2">
             <div className="flex justify-between items-center text-sm">
-              <span className="font-medium">{files.length} files selected</span>
+              <span className="font-medium">{state.uploadedFiles.length} files selected</span>
               <span className="text-muted-foreground">
-                {files.length} of {MAX_FILES} max
+                {state.uploadedFiles.length} of {MAX_FILES} max
               </span>
             </div>
-            <Progress value={(files.length / MAX_FILES) * 100} className="h-2" />
+            <Progress value={(state.uploadedFiles.length / MAX_FILES) * 100} className="h-2" />
 
             <div className="mt-4 space-y-2 max-h-60 overflow-y-auto">
-              {files.map((file, index) => (
-                <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
+              {state.uploadedFiles.map((uploadedFile) => (
+                <div key={uploadedFile.id} className="flex items-center justify-between p-2 bg-muted rounded-md">
                   <div className="flex items-center overflow-hidden">
                     <File className="h-4 w-4 mr-2 text-muted-foreground flex-shrink-0" />
-                    <span className="text-sm truncate">{file.name}</span>
-                    <span className="text-xs text-muted-foreground ml-2">({formatFileSize(file.size)})</span>
+                    <span className="text-sm truncate">{uploadedFile.name}</span>
+                    <span className="text-xs text-muted-foreground ml-2">({formatFileSize(uploadedFile.size)})</span>
                   </div>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-6 w-6 flex-shrink-0"
-                    onClick={() => removeFile(index)}
+                    onClick={() => removeFile(uploadedFile.id)}
                     disabled={isUploading}
                   >
                     <X className="h-4 w-4" />
