@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
@@ -32,7 +33,11 @@ export default function MobileNav() {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[350px]">
         <SheetHeader>
-          <SheetTitle>KAMINAMI</SheetTitle>
+          <SheetTitle>
+            <Link href="/" className="text-xl font-bold hover:text-primary transition-colors">
+              NAMIRecruit
+            </Link>
+          </SheetTitle>
         </SheetHeader>
         <div className="py-4">
           <Accordion type="single" collapsible className="w-full">

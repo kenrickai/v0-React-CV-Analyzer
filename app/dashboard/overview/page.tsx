@@ -4,6 +4,11 @@ import { Progress } from "@/components/ui/progress"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { BarChart, PieChart, Users } from "lucide-react"
 
+export const metadata = {
+  title: "Overview - NAMIRecruit",
+  description: "Overview dashboard for NAMIRecruit Resume Analysis Application",
+}
+
 // Mock data for demonstration
 const userData = [
   {

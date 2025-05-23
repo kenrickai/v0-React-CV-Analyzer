@@ -2,20 +2,35 @@
 
 import type React from "react"
 
-import { useState } from "react"
-import { Upload, File, X } from "lucide-react"
+import { useState, useRef } from "react"
+import { Upload, File, X, AlertCircle, CheckCircle2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { processResumes } from "@/app/actions/upload-actions"
+
+// Define allowed file types
+const ALLOWED_FILE_TYPES = [
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // docx
+  "application/msword", // doc
+]
+
+// Maximum file size in bytes (10MB)
+const MAX_FILE_SIZE = 10 * 1024 * 1024
+
+// Maximum number of files
+const MAX_FILES = 100
 
 export default function ResumeUploader() {
-  const [files, setFiles] = useState<string[]>([
-    "john_smith_resume.pdf",
-    "sarah_johnson_cv.pdf",
-    "michael_williams_resume.docx",
-  ])
-
+  const [files, setFiles] = useState<File[]>([])
   const [isDragging, setIsDragging] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -26,17 +41,134 @@ export default function ResumeUploader() {
     setIsDragging(false)
   }
 
+  const validateFiles = (filesToValidate: File[]): { valid: File[]; errors: string[] } => {
+    const validFiles: File[] = []
+    const errors: string[] = []
+
+    // Check if adding these files would exceed the maximum
+    if (files.length + filesToValidate.length > MAX_FILES) {
+      errors.push(`You can upload a maximum of ${MAX_FILES} files.`)
+      return { valid: validFiles, errors }
+    }
+
+    filesToValidate.forEach((file) => {
+      // Check file type
+      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+        errors.push(`${file.name} is not a supported file type. Please upload PDF or DOCX files only.`)
+        return
+      }
+
+      // Check file size
+      if (file.size > MAX_FILE_SIZE) {
+        errors.push(`${file.name} exceeds the maximum file size of 10MB.`)
+        return
+      }
+
+      // Check for duplicate files
+      if (files.some((existingFile) => existingFile.name === file.name)) {
+        errors.push(`${file.name} has already been added.`)
+        return
+      }
+
+      validFiles.push(file)
+    })
+
+    return { valid: validFiles, errors }
+  }
+
+  const handleFilesSelected = (selectedFiles: FileList | null) => {
+    if (!selectedFiles || selectedFiles.length === 0) return
+
+    const fileArray = Array.from(selectedFiles)
+    const { valid, errors } = validateFiles(fileArray)
+
+    if (errors.length > 0) {
+      setError(errors.join(" "))
+      setTimeout(() => setError(null), 5000)
+    }
+
+    if (valid.length > 0) {
+      setFiles((prevFiles) => [...prevFiles, ...valid])
+      setSuccess(`Added ${valid.length} file${valid.length > 1 ? "s" : ""} successfully.`)
+      setTimeout(() => setSuccess(null), 3000)
+    }
+  }
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault()
     setIsDragging(false)
-    // In a real app, we would process the dropped files here
-    setFiles([...files, "new_dropped_file.pdf"])
+    handleFilesSelected(e.dataTransfer.files)
+  }
+
+  const handleBrowseClick = () => {
+    fileInputRef.current?.click()
+  }
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleFilesSelected(e.target.files)
+    // Reset the input value so the same file can be selected again if removed
+    e.target.value = ""
   }
 
   const removeFile = (index: number) => {
     const newFiles = [...files]
     newFiles.splice(index, 1)
     setFiles(newFiles)
+  }
+
+  const handleUpload = async () => {
+    if (files.length === 0) {
+      setError("Please select at least one file to upload.")
+      setTimeout(() => setError(null), 5000)
+      return
+    }
+
+    setIsUploading(true)
+    setUploadProgress(0)
+
+    // Create a FormData object to send files
+    const formData = new FormData()
+    files.forEach((file) => {
+      formData.append("files", file)
+    })
+
+    try {
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          const newProgress = prev + Math.random() * 15
+          return newProgress >= 100 ? 100 : newProgress
+        })
+      }, 500)
+
+      // Process the files using the server action
+      const result = await processResumes(formData)
+
+      clearInterval(progressInterval)
+      setUploadProgress(100)
+
+      // Show success message
+      setSuccess(result.message)
+
+      // Reset after successful upload
+      setTimeout(() => {
+        setIsUploading(false)
+        setUploadProgress(0)
+        // Uncomment the following line to clear files after successful upload
+        // setFiles([])
+      }, 2000)
+    } catch (err) {
+      setError("An error occurred while uploading files. Please try again.")
+      setIsUploading(false)
+      setUploadProgress(0)
+    }
+  }
+
+  // Format file size for display
+  const formatFileSize = (bytes: number): string => {
+    if (bytes < 1024) return bytes + " bytes"
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + " KB"
+    else return (bytes / 1048576).toFixed(1) + " MB"
   }
 
   return (
@@ -46,6 +178,22 @@ export default function ResumeUploader() {
         <CardDescription>Upload up to 100 resumes in PDF or DOCX format</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {success && (
+          <Alert variant="default" className="bg-green-50 text-green-800 border-green-200">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <AlertTitle>Success</AlertTitle>
+            <AlertDescription>{success}</AlertDescription>
+          </Alert>
+        )}
+
         <div
           className={`border-2 border-dashed rounded-lg p-6 text-center ${
             isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25"
@@ -59,33 +207,64 @@ export default function ResumeUploader() {
           </div>
           <h3 className="text-lg font-semibold mb-1">Drag and drop resumes</h3>
           <p className="text-sm text-muted-foreground mb-3">or click to browse files</p>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleBrowseClick} disabled={isUploading}>
             Browse Files
           </Button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileInputChange}
+            className="hidden"
+            multiple
+            accept=".pdf,.docx,.doc"
+          />
         </div>
 
         {files.length > 0 && (
           <div className="space-y-2">
             <div className="flex justify-between items-center text-sm">
-              <span className="font-medium">{files.length} files uploaded</span>
-              <span className="text-muted-foreground">3 of 100 max</span>
+              <span className="font-medium">{files.length} files selected</span>
+              <span className="text-muted-foreground">
+                {files.length} of {MAX_FILES} max
+              </span>
             </div>
-            <Progress value={3} className="h-2" />
+            <Progress value={(files.length / MAX_FILES) * 100} className="h-2" />
 
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 space-y-2 max-h-60 overflow-y-auto">
               {files.map((file, index) => (
                 <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
-                  <div className="flex items-center">
-                    <File className="h-4 w-4 mr-2 text-muted-foreground" />
-                    <span className="text-sm">{file}</span>
+                  <div className="flex items-center overflow-hidden">
+                    <File className="h-4 w-4 mr-2 text-muted-foreground flex-shrink-0" />
+                    <span className="text-sm truncate">{file.name}</span>
+                    <span className="text-xs text-muted-foreground ml-2">({formatFileSize(file.size)})</span>
                   </div>
-                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeFile(index)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 flex-shrink-0"
+                    onClick={() => removeFile(index)}
+                    disabled={isUploading}
+                  >
                     <X className="h-4 w-4" />
                     <span className="sr-only">Remove file</span>
                   </Button>
                 </div>
               ))}
             </div>
+
+            {isUploading ? (
+              <div className="space-y-2 mt-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="font-medium">Uploading...</span>
+                  <span className="text-muted-foreground">{Math.round(uploadProgress)}%</span>
+                </div>
+                <Progress value={uploadProgress} className="h-2" />
+              </div>
+            ) : (
+              <div className="flex justify-end mt-4">
+                <Button onClick={handleUpload}>Upload Resumes</Button>
+              </div>
+            )}
           </div>
         )}
       </CardContent>

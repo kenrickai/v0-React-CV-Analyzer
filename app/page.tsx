@@ -1,4 +1,8 @@
+"use client"
+
+import { useState } from "react"
 import { Upload } from "lucide-react"
+import Link from "next/link"
 import ResumeUploader from "@/components/resume-uploader"
 import CriteriaUploader from "@/components/criteria-uploader"
 import ResultsTable from "@/components/results-table"
@@ -7,11 +11,39 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import MobileNav from "@/components/mobile-nav"
 
 export default function HomePage() {
+  const [activeTab, setActiveTab] = useState("upload")
+  const [analysisProgress, setAnalysisProgress] = useState(0)
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+
+  const handleContinueToAnalysis = () => {
+    setActiveTab("analyze")
+    setIsAnalyzing(true)
+
+    // Simulate analysis progress
+    setAnalysisProgress(0)
+    const interval = setInterval(() => {
+      setAnalysisProgress((prev) => {
+        const newProgress = prev + Math.random() * 10
+        if (newProgress >= 100) {
+          clearInterval(interval)
+          setTimeout(() => {
+            setIsAnalyzing(false)
+            setActiveTab("results")
+          }, 500)
+          return 100
+        }
+        return newProgress
+      })
+    }, 500)
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
         <div className="container mx-auto py-4 px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">KAMINAMI</h1>
+          <Link href="/" className="text-2xl font-bold hover:text-primary transition-colors">
+            NAMIRecruit
+          </Link>
           <nav className="hidden md:flex items-center gap-6">
             <div className="relative group">
               <button className="text-sm font-medium hover:text-primary flex items-center gap-1">
@@ -221,7 +253,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <Tabs defaultValue="upload" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-3 mb-8">
             <TabsTrigger value="upload">Upload</TabsTrigger>
             <TabsTrigger value="analyze">Analyze</TabsTrigger>
@@ -234,7 +266,9 @@ export default function HomePage() {
               <CriteriaUploader />
             </div>
             <div className="flex justify-end">
-              <Button size="lg">Continue to Analysis</Button>
+              <Button size="lg" onClick={handleContinueToAnalysis}>
+                Continue to Analysis
+              </Button>
             </div>
           </TabsContent>
 
@@ -245,12 +279,15 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Analyzing Resumes</h3>
               <p className="text-muted-foreground mb-4">
-                Our system is analyzing 42 resumes against your job criteria. This may take a few minutes.
+                Our system is analyzing your resumes against your job criteria. This may take a few minutes.
               </p>
               <div className="w-full max-w-md mx-auto h-2 bg-secondary rounded-full overflow-hidden">
-                <div className="bg-primary h-full w-3/4 rounded-full"></div>
+                <div
+                  className="bg-primary h-full rounded-full transition-all duration-300 ease-in-out"
+                  style={{ width: `${Math.round(analysisProgress)}%` }}
+                ></div>
               </div>
-              <p className="text-sm text-muted-foreground mt-2">75% complete</p>
+              <p className="text-sm text-muted-foreground mt-2">{Math.round(analysisProgress)}% complete</p>
             </div>
           </TabsContent>
 
@@ -277,7 +314,7 @@ export default function HomePage() {
         <div className="container mx-auto py-6 px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} KAMINAMI. All rights reserved.
+              &copy; {new Date().getFullYear()} NAMIRecruit. All rights reserved.
             </p>
             <div className="flex gap-4 mt-4 md:mt-0">
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
