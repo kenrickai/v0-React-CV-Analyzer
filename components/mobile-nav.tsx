@@ -32,7 +32,7 @@ export default function MobileNav() {
       </SheetTrigger>
       <SheetContent side="left" className="w-[300px] sm:w-[350px]">
         <SheetHeader>
-          <SheetTitle>RecruitMatch Pro</SheetTitle>
+          <SheetTitle>KAMINAMI</SheetTitle>
         </SheetHeader>
         <div className="py-4">
           <Accordion type="single" collapsible className="w-full">
@@ -40,13 +40,13 @@ export default function MobileNav() {
               <AccordionTrigger>Dashboard</AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col space-y-2 pl-4">
-                  <a href="#" className="text-sm py-1 hover:text-primary">
+                  <a href="/dashboard/overview" className="text-sm py-1 hover:text-primary">
                     Overview
                   </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
+                  <a href="/dashboard/analytics" className="text-sm py-1 hover:text-primary">
                     Analytics
                   </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
+                  <a href="/dashboard/recent-activity" className="text-sm py-1 hover:text-primary">
                     Recent Activity
                   </a>
                 </div>

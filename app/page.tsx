@@ -11,7 +11,7 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col">
       <header className="border-b">
         <div className="container mx-auto py-4 px-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold">RecruitMatch Pro</h1>
+          <h1 className="text-2xl font-bold">KAMINAMI</h1>
           <nav className="hidden md:flex items-center gap-6">
             <div className="relative group">
               <button className="text-sm font-medium hover:text-primary flex items-center gap-1">
@@ -33,13 +33,25 @@ export default function HomePage() {
               </button>
               <div className="absolute left-0 top-full mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-1" role="menu" aria-orientation="vertical">
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                  <a
+                    href="/dashboard/overview"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                  >
                     Overview
                   </a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                  <a
+                    href="/dashboard/analytics"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                  >
                     Analytics
                   </a>
-                  <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                  <a
+                    href="/dashboard/recent-activity"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    role="menuitem"
+                  >
                     Recent Activity
                   </a>
                 </div>
@@ -265,7 +277,7 @@ export default function HomePage() {
         <div className="container mx-auto py-6 px-4">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} RecruitMatch Pro. All rights reserved.
+              &copy; {new Date().getFullYear()} KAMINAMI. All rights reserved.
             </p>
             <div className="flex gap-4 mt-4 md:mt-0">
               <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
