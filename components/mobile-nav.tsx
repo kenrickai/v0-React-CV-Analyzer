@@ -40,53 +40,67 @@ export default function MobileNav() {
           </SheetTitle>
         </SheetHeader>
         <div className="py-4">
+          <div className="space-y-2 mb-6">
+            <h3 className="text-sm font-medium mb-2 px-4">Main Navigation</h3>
+            <Link
+              href="/dashboard"
+              className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+              onClick={() => setOpen(false)}
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/job-analysis"
+              className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+              onClick={() => setOpen(false)}
+            >
+              Job Analysis
+            </Link>
+            <Link
+              href="/resume-database"
+              className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+              onClick={() => setOpen(false)}
+            >
+              Resume Database
+            </Link>
+            <Link
+              href="/hr-kpi-guide"
+              className="block px-4 py-2 text-sm hover:bg-muted rounded-md"
+              onClick={() => setOpen(false)}
+            >
+              HR KPI Guide
+            </Link>
+            <Link href="/" className="block px-4 py-2 text-sm hover:bg-muted rounded-md" onClick={() => setOpen(false)}>
+              Resume Analysis
+            </Link>
+          </div>
+
           <Accordion type="single" collapsible className="w-full">
-            <AccordionItem value="dashboard">
-              <AccordionTrigger>Dashboard</AccordionTrigger>
+            <AccordionItem value="dashboard-sub">
+              <AccordionTrigger>Dashboard Details</AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col space-y-2 pl-4">
-                  <a href="/dashboard/overview" className="text-sm py-1 hover:text-primary">
+                  <Link
+                    href="/dashboard/overview"
+                    className="text-sm py-1 hover:text-primary"
+                    onClick={() => setOpen(false)}
+                  >
                     Overview
-                  </a>
-                  <a href="/dashboard/analytics" className="text-sm py-1 hover:text-primary">
+                  </Link>
+                  <Link
+                    href="/dashboard/analytics"
+                    className="text-sm py-1 hover:text-primary"
+                    onClick={() => setOpen(false)}
+                  >
                     Analytics
-                  </a>
-                  <a href="/dashboard/recent-activity" className="text-sm py-1 hover:text-primary">
+                  </Link>
+                  <Link
+                    href="/dashboard/recent-activity"
+                    className="text-sm py-1 hover:text-primary"
+                    onClick={() => setOpen(false)}
+                  >
                     Recent Activity
-                  </a>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="jobs">
-              <AccordionTrigger>Job Analysis</AccordionTrigger>
-              <AccordionContent>
-                <div className="flex flex-col space-y-2 pl-4">
-                  <a href="/job-analysis" className="text-sm py-1 hover:text-primary">
-                    Job Analysis
-                  </a>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="candidates">
-              <AccordionTrigger>Resume Database</AccordionTrigger>
-              <AccordionContent>
-                <div className="flex flex-col space-y-2 pl-4">
-                  <a href="/resume-database" className="text-sm py-1 hover:text-primary">
-                    Resume Database
-                  </a>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            <AccordionItem value="hr-guide">
-              <AccordionTrigger>HR KPI Guide</AccordionTrigger>
-              <AccordionContent>
-                <div className="flex flex-col space-y-2 pl-4">
-                  <a href="/hr-kpi-guide" className="text-sm py-1 hover:text-primary">
-                    HR KPI Guide
-                  </a>
+                  </Link>
                 </div>
               </AccordionContent>
             </AccordionItem>

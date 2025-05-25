@@ -8,11 +8,17 @@ export default function SharedHeader() {
           NAMIRecruit
         </Link>
         <nav className="hidden md:flex items-center gap-6">
-          <Link href="/dashboard" className="text-sm font-medium hover:text-primary">
+          <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">
             Dashboard
           </Link>
-          <Link href="/" className="text-sm font-medium hover:text-primary">
-            Resume Analysis
+          <Link href="/job-analysis" className="text-sm font-medium hover:text-primary transition-colors">
+            Job Analysis
+          </Link>
+          <Link href="/resume-database" className="text-sm font-medium hover:text-primary transition-colors">
+            Resume Database
+          </Link>
+          <Link href="/hr-kpi-guide" className="text-sm font-medium hover:text-primary transition-colors">
+            HR KPI Guide
           </Link>
         </nav>
       </div>

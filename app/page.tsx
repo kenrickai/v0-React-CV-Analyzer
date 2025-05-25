@@ -37,62 +37,16 @@ function MainContent() {
             NAMIRecruit
           </Link>
           <nav className="hidden md:flex items-center gap-6">
-            <div className="relative group">
-              <button className="text-sm font-medium hover:text-primary flex items-center gap-1">
-                Dashboard
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="ml-0.5"
-                >
-                  <path d="m6 9 6 6 6-6" />
-                </svg>
-              </button>
-              <div className="absolute left-0 top-full mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                <div className="py-1" role="menu" aria-orientation="vertical">
-                  <a
-                    href="/dashboard/overview"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                  >
-                    Overview
-                  </a>
-                  <a
-                    href="/dashboard/analytics"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                  >
-                    Analytics
-                  </a>
-                  <a
-                    href="/dashboard/recent-activity"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    role="menuitem"
-                  >
-                    Recent Activity
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative group">
-              <Link href="/job-analysis" className="text-sm font-medium hover:text-primary">
-                Job Analysis
-              </Link>
-            </div>
-
-            <Link href="/resume-database" className="text-sm font-medium hover:text-primary">
+            <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">
+              Dashboard
+            </Link>
+            <Link href="/job-analysis" className="text-sm font-medium hover:text-primary transition-colors">
+              Job Analysis
+            </Link>
+            <Link href="/resume-database" className="text-sm font-medium hover:text-primary transition-colors">
               Resume Database
             </Link>
-
-            <Link href="/hr-kpi-guide" className="text-sm font-medium hover:text-primary">
+            <Link href="/hr-kpi-guide" className="text-sm font-medium hover:text-primary transition-colors">
               HR KPI Guide
             </Link>
 

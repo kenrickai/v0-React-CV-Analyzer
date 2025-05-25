@@ -24,6 +24,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             <Link href="/dashboard" className="text-sm font-medium hover:text-primary">
               Dashboard
             </Link>
+            <Link href="/job-analysis" className="text-sm font-medium hover:text-primary">
+              Job Analysis
+            </Link>
+            <Link href="/resume-database" className="text-sm font-medium hover:text-primary">
+              Resume Database
+            </Link>
+            <Link href="/hr-kpi-guide" className="text-sm font-medium hover:text-primary">
+              HR KPI Guide
+            </Link>
             <Link href="/" className="text-sm font-medium hover:text-primary">
               Resume Analysis
             </Link>
