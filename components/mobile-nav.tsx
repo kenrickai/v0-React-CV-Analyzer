@@ -59,60 +59,33 @@ export default function MobileNav() {
             </AccordionItem>
 
             <AccordionItem value="jobs">
-              <AccordionTrigger>Jobs</AccordionTrigger>
+              <AccordionTrigger>Job Analysis</AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col space-y-2 pl-4">
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Active Listings
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Create New Job
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Job Templates
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Archived Jobs
+                  <a href="/job-analysis" className="text-sm py-1 hover:text-primary">
+                    Job Analysis
                   </a>
                 </div>
               </AccordionContent>
             </AccordionItem>
 
             <AccordionItem value="candidates">
-              <AccordionTrigger>Candidates</AccordionTrigger>
+              <AccordionTrigger>Resume Database</AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col space-y-2 pl-4">
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    All Candidates
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Matched Candidates
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
+                  <a href="/resume-database" className="text-sm py-1 hover:text-primary">
                     Resume Database
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Talent Pool
                   </a>
                 </div>
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="reports">
-              <AccordionTrigger>Reports</AccordionTrigger>
+            <AccordionItem value="hr-guide">
+              <AccordionTrigger>HR KPI Guide</AccordionTrigger>
               <AccordionContent>
                 <div className="flex flex-col space-y-2 pl-4">
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Match Analytics
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Hiring Metrics
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Candidate Sources
-                  </a>
-                  <a href="#" className="text-sm py-1 hover:text-primary">
-                    Custom Reports
+                  <a href="/hr-kpi-guide" className="text-sm py-1 hover:text-primary">
+                    HR KPI Guide
                   </a>
                 </div>
               </AccordionContent>
